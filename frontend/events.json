@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Noite de Karaokê Anime",
+        "date": "Toda Sexta, 20:00",
+        "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!",
+        "icon": "mic"
+    },
+    {
+        "name": "Campeonato de LoL",
+        "date": "15 de Março, 14:00",
+        "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.",
+        "icon": "swords"
+    },
+    {
+        "name": "Maratona Ghibli",
+        "date": "22 de Março, 18:00",
+        "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.",
+        "icon": "film"
+    }
+]
