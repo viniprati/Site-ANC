@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-    <script src="https://unpkg.com/lucide-react@0.309.0/dist/umd/lucide-react.js"></script>
+    <!-- Adicionado para o Socket.IO do chat funcionar -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://unpkg.com/lucide-icons"></script>
 
 
@@ -59,8 +60,8 @@
     </header>
 
     <main>
-        <!-- Seção Inicial -->
-        <section id="inicio" class="min-h-screen flex items-center justify-center bg-cover bg-center bg-fixed" style="background-image: url('https://i.pinimg.com/originals/e4/13/46/e4134668b3684a27522ab59e21827457.gif');">
+        <!-- Seção Inicial (AGORA SEM O 'style' COM A IMAGEM FIXA) -->
+        <section id="inicio" class="min-h-screen flex items-center justify-center bg-cover bg-center bg-fixed">
             <div class="absolute inset-0 bg-black/70"></div>
             <div class="container mx-auto text-center z-10 p-4 animate-fade-in-up">
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-widest leading-tight">

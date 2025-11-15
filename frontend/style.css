@@ -1,6 +1,11 @@
 /* Importa a fonte para garantir que está disponível */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap');
 
+/* Adicionado para a transição suave do background do slideshow */
+#inicio {
+    transition: background-image 1.5s ease-in-out;
+}
+
 /* Animação para os elementos entrarem na tela */
 @keyframes fadeInUp {
     from {
