@@ -1,5 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // A API_URL ainda é necessária para funcionalidades como o chat
+    
+    // --- LÓGICA DE AUTENTICAÇÃO ---
+    // Esta função verifica se o usuário está logado e atualiza o header
+    async function checkAuthStatus() {
+        const authSection = document.getElementById('auth-section');
+        const mobileLoginLink = document.getElementById('mobile-login-link'); // ID para o link no menu mobile
+
+        if (!authSection) {
+            console.error("Elemento 'auth-section' não encontrado no HTML.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/me');
+            if (response.ok) {
+                const user = await response.json();
+                const avatarURL = user.avatar 
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                    : 'https://cdn.discordapp.com/embed/avatars/0.png'; // Avatar padrão do Discord
+
+                // Atualiza o header principal (desktop)
+                authSection.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${avatarURL}" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-purple-400"/>
+                        <span class="font-semibold">${user.username}</span>
+                        <a href="/auth/logout" class="text-sm text-gray-400 hover:text-white" title="Sair">(Sair)</a>
+                    </div>
+                `;
+
+                // Atualiza o link no menu mobile para mostrar "Logout"
+                if (mobileLoginLink) {
+                    mobileLoginLink.innerHTML = 'Logout';
+                    mobileLoginLink.href = '/auth/logout';
+                    mobileLoginLink.classList.remove('bg-purple-600'); 
+                    mobileLoginLink.classList.add('hover:bg-red-700'); // Estilo opcional para logout
+                }
+
+            }
+        } catch (error) {
+            console.error("Não foi possível verificar o status de autenticação:", error);
+        }
+    }
+    // Chama a função de autenticação assim que a página carrega
+    checkAuthStatus();
+
+    // --- O RESTO DO SEU CÓDIGO ---
+
     const API_URL = 'http://localhost:4000'; 
 
     // --- LÓGICA DO SLIDESHOW DE BACKGROUND ---
@@ -15,23 +61,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentGifIndex = 0;
 
     function changeBackground() {
+        if (!heroSection) return;
         const nextIndex = (currentGifIndex + 1) % backgroundGifs.length;
         const img = new Image();
         img.src = backgroundGifs[nextIndex];
 
-        if (heroSection) {
-            heroSection.style.backgroundImage = `url('${backgroundGifs[currentGifIndex]}')`;
-        }
-        
+        heroSection.style.backgroundImage = `url('${backgroundGifs[currentGifIndex]}')`;
         currentGifIndex = (currentGifIndex + 1) % backgroundGifs.length;
     }
 
     changeBackground();
     setInterval(changeBackground, 5000);
 
-    // ---------------------------------------------
-
-    // Lógica do Menu Mobile
+    // --- LÓGICA DO MENU MOBILE ---
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 
@@ -47,35 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Carregamento Dinâmico de Eventos ---
+    // --- CARREGAMENTO DE EVENTOS ---
     function loadEvents() {
-        // OS DADOS DO JSON AGORA ESTÃO AQUI DENTRO. PROBLEMA RESOLVIDO.
         const events = [
-            {
-                "name": "Noite de Karaokê Anime",
-                "date": "Toda Sexta, 20:00",
-                "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!",
-                "icon": "mic"
-            },
-            {
-                "name": "Campeonato de LoL",
-                "date": "15 de Março, 14:00",
-                "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.",
-                "icon": "swords"
-            },
-            {
-                "name": "Maratona Ghibli",
-                "date": "22 de Março, 18:00",
-                "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.",
-                "icon": "film"
-            }
+            {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!", "icon": "mic"},
+            {"name": "Campeonato de LoL", "date": "15 de Março, 14:00", "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.", "icon": "swords"},
+            {"name": "Maratona Ghibli", "date": "22 de Março, 18:00", "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.", "icon": "film"}
         ];
 
         const eventsGrid = document.getElementById('events-grid');
         if (!eventsGrid) return;
 
-        eventsGrid.innerHTML = ''; // Limpa a área
-
+        eventsGrid.innerHTML = '';
         for (const event of events) {
             const card = document.createElement('div');
             card.className = 'bg-gray-800/50 border border-gray-700 p-6 rounded-lg text-left transform hover:-translate-y-2 transition-transform duration-300 shadow-lg';
@@ -98,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadEvents();
 
-    // --- Lógica do Chat de Suporte com Back-end ---
+    // --- LÓGICA DO CHAT DE SUPORTE ---
     const openChatBtn = document.getElementById('open-chat-btn');
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatWidget = document.getElementById('chat-widget');
