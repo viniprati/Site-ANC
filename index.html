@@ -43,7 +43,11 @@
                 <a href="#inicio" class="hover:text-pink-400 transition-colors">Início</a>
                 <a href="#eventos" class="hover:text-pink-400 transition-colors">Eventos</a>
                 <a href="#suporte" class="hover:text-pink-400 transition-colors">Suporte</a>
-                <a href="https://discord.gg/animescafe" target="_blank" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md transition-all duration-300">Discord</a>
+                
+                <!-- ÁREA DE LOGIN DINÂMICA (AQUI ESTÁ A MUDANÇA) -->
+                <div id="auth-section">
+                    <a href="/auth/discord" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md transition-all duration-300">Login com Discord</a>
+                </div>
             </nav>
             <button id="mobile-menu-button" class="md:hidden">
                 <i data-lucide="menu" class="w-6 h-6"></i>
@@ -54,7 +58,9 @@
             <a href="#inicio" class="block text-center py-3 hover:bg-purple-700 transition-colors">Início</a>
             <a href="#eventos" class="block text-center py-3 hover:bg-purple-700 transition-colors">Eventos</a>
             <a href="#suporte" class="block text-center py-3 hover:bg-purple-700 transition-colors">Suporte</a>
-            <a href="https://discord.gg/animescafe" target="_blank" class="block text-center py-3 bg-purple-600 hover:bg-purple-700 transition-colors">Discord</a>
+            
+            <!-- LOGIN NO MENU MOBILE (AQUI ESTÁ A OUTRA MUDANÇA) -->
+            <a href="/auth/discord" class="block text-center py-3 bg-purple-600 hover:bg-purple-700 transition-colors">Login com Discord</a>
         </div>
     </header>
 

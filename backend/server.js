@@ -1,27 +1,26 @@
-// Carrega as variáveis do arquivo .env que está na pasta raiz
 require('dotenv').config({ path: '../.env' }); 
-
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const authRoutes = require('./routes/authRoutes'); // Importa nossas rotas
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const port = 4000;
 
-// Configura a sessão para manter o usuário logado
+// CÓDIGO CORRIGIDO AQUI
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET, // A 'secret' agora é uma opção obrigatória aqui dentro
     resave: false,
     saveUninitialized: false,
+    cookie: { secure: false } 
 }));
 
-// Usa as rotas que criamos no outro arquivo
-app.use('/', authRoutes);
-
-// Serve os arquivos do front-end (index.html, script.js, etc.) que estão na pasta raiz
+// Servindo os arquivos do front-end
 app.use(express.static(path.join(__dirname, '..')));
 
+// Usando as rotas de autenticação
+app.use('/', authRoutes);
+
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`🚀 Servidor rodando lindamente em http://localhost:${port}`);
 });
