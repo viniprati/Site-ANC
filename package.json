@@ -1,26 +1,17 @@
 {
-  "name": "site-anc-backend",
+  "name": "site-anc",
   "version": "1.0.0",
   "description": "Servidor para o site Animes Café",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js"
   },
-  "author": "Seu Nome",
+  "author": "Vinicius Prati",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/viniprati/Site-ANC.git"
-  },
-  "keywords": [],
-  "bugs": {
-    "url": "https://github.com/viniprati/Site-ANC/issues"
-  },
-  "homepage": "https://github.com/viniprati/Site-ANC#readme"
+  }
 }
