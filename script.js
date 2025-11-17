@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // A API_URL ainda é necessária para a funcionalidade de chat
+    // A API_URL ainda é necessária para funcionalidades como o chat
     const API_URL = 'http://localhost:4000'; 
 
     // --- LÓGICA DO SLIDESHOW DE BACKGROUND ---
@@ -31,9 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---------------------------------------------
 
-    // Inicializa os ícones do Lucide
-    lucide.createIcons();
-
     // Lógica do Menu Mobile
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -42,73 +39,66 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
-
-        mobileMenu.querySelectorAll('a').forEach(link => {
+        
+        for (const link of mobileMenu.querySelectorAll('a')) {
             link.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
             });
-        });
+        }
     }
 
-    // --- Carregamento Dinâmico de Eventos do Arquivo Local ---
-    async function loadEvents() {
-        console.log("1. Iniciando a função loadEvents().");
+    // --- Carregamento Dinâmico de Eventos ---
+    function loadEvents() {
+        // OS DADOS DO JSON AGORA ESTÃO AQUI DENTRO. PROBLEMA RESOLVIDO.
+        const events = [
+            {
+                "name": "Noite de Karaokê Anime",
+                "date": "Toda Sexta, 20:00",
+                "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!",
+                "icon": "mic"
+            },
+            {
+                "name": "Campeonato de LoL",
+                "date": "15 de Março, 14:00",
+                "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.",
+                "icon": "swords"
+            },
+            {
+                "name": "Maratona Ghibli",
+                "date": "22 de Março, 18:00",
+                "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.",
+                "icon": "film"
+            }
+        ];
 
         const eventsGrid = document.getElementById('events-grid');
-        
-        if (!eventsGrid) {
-            console.error("ERRO CRÍTICO: Não foi encontrada a div com id='events-grid' no HTML.");
-            return;
-        }
-        console.log("2. Elemento #events-grid encontrado com sucesso.");
+        if (!eventsGrid) return;
 
-        try {
-            const filePath = 'frontend/events.json';
-            console.log(`3. Tentando buscar o arquivo em: ${filePath}`);
-            
-            const response = await fetch(filePath);
-            console.log("4. Resposta do fetch recebida:", response);
+        eventsGrid.innerHTML = ''; // Limpa a área
 
-            if (!response.ok) {
-                // Se a resposta não for OK, lança um erro com o status.
-                throw new Error(`Falha ao buscar o arquivo. Status: ${response.status} - ${response.statusText}`);
-            }
-            
-            const events = await response.json();
-            console.log("5. Arquivo JSON convertido com sucesso:", events);
-
-            eventsGrid.innerHTML = ''; // Limpa a área
-            events.forEach(event => {
-                const card = document.createElement('div');
-                card.className = 'bg-gray-800/50 border border-gray-700 p-6 rounded-lg text-left transform hover:-translate-y-2 transition-transform duration-300 shadow-lg';
-                card.innerHTML = `
-                    <div class="flex items-center mb-4">
-                        <div class="bg-purple-600/20 p-3 rounded-full mr-4">
-                            <i data-lucide="${event.icon || 'calendar'}" class="text-purple-400 w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold">${event.name}</h3>
-                            <p class="text-purple-400 text-sm">${event.date}</p>
-                        </div>
+        for (const event of events) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-800/50 border border-gray-700 p-6 rounded-lg text-left transform hover:-translate-y-2 transition-transform duration-300 shadow-lg';
+            card.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <div class="bg-purple-600/20 p-3 rounded-full mr-4">
+                        <i data-lucide="${event.icon || 'calendar'}" class="text-purple-400 w-6 h-6"></i>
                     </div>
-                    <p class="text-gray-400">${event.description}</p>
-                `;
-                eventsGrid.appendChild(card);
-            });
-            
-            console.log("6. Cards de eventos adicionados ao HTML.");
-            lucide.createIcons();
-            console.log("7. Ícones do Lucide renderizados. Processo concluído com SUCESSO!");
-            
-        } catch (error) {
-            console.error("ERRO NO PROCESSO DE CARREGAR EVENTOS:", error);
-            eventsGrid.innerHTML = `<p class="text-red-400 col-span-full text-center">Falha ao carregar eventos. Verifique o console (F12) para mais detalhes.</p>`;
+                    <div>
+                        <h3 class="text-xl font-bold">${event.name}</h3>
+                        <p class="text-purple-400 text-sm">${event.date}</p>
+                    </div>
+                </div>
+                <p class="text-gray-400">${event.description}</p>
+            `;
+            eventsGrid.appendChild(card);
         }
+        
+        lucide.createIcons();
     }
     loadEvents();
 
     // --- Lógica do Chat de Suporte com Back-end ---
-    // (O resto do seu código permanece igual)
     const openChatBtn = document.getElementById('open-chat-btn');
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatWidget = document.getElementById('chat-widget');
@@ -151,7 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     
                 chatMessages.innerHTML = '';
-                data.messages.forEach(msg => addMessage(msg.content, msg.sender));
+                
+                for (const msg of data.messages) {
+                    addMessage(msg.content, msg.sender);
+                }
     
                 socket.on('new-message', (msg) => {
                     if (msg.sender !== 'user') {
