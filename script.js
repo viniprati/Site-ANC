@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://localhost:4000'; // URL do seu back-end
+    // A API_URL ainda é necessária para a funcionalidade de chat
+    const API_URL = 'http://localhost:4000'; 
 
     // --- LÓGICA DO SLIDESHOW DE BACKGROUND ---
     const backgroundGifs = [
@@ -14,25 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentGifIndex = 0;
 
     function changeBackground() {
-        // Pré-carrega a próxima imagem para uma transição mais suave
         const nextIndex = (currentGifIndex + 1) % backgroundGifs.length;
         const img = new Image();
         img.src = backgroundGifs[nextIndex];
 
-        // Altera o background da seção
         if (heroSection) {
             heroSection.style.backgroundImage = `url('${backgroundGifs[currentGifIndex]}')`;
         }
         
-        // Atualiza o índice para o próximo GIF
         currentGifIndex = (currentGifIndex + 1) % backgroundGifs.length;
     }
 
-    // Define o primeiro GIF imediatamente e depois troca a cada 5 segundos (5000ms)
     changeBackground();
     setInterval(changeBackground, 5000);
 
-    // O restante do seu código original continua abaixo
     // ---------------------------------------------
 
     // Inicializa os ícones do Lucide
@@ -54,19 +50,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Carregamento Dinâmico de Eventos via API ---
+    // --- Carregamento Dinâmico de Eventos do Arquivo Local ---
     async function loadEvents() {
+        console.log("1. Iniciando a função loadEvents().");
+
         const eventsGrid = document.getElementById('events-grid');
-        if (!eventsGrid) return;
+        
+        if (!eventsGrid) {
+            console.error("ERRO CRÍTICO: Não foi encontrada a div com id='events-grid' no HTML.");
+            return;
+        }
+        console.log("2. Elemento #events-grid encontrado com sucesso.");
 
         try {
-            const response = await fetch(`${API_URL}/api/events`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const events = await response.json();
+            const filePath = 'frontend/events.json';
+            console.log(`3. Tentando buscar o arquivo em: ${filePath}`);
+            
+            const response = await fetch(filePath);
+            console.log("4. Resposta do fetch recebida:", response);
 
-            eventsGrid.innerHTML = '';
+            if (!response.ok) {
+                // Se a resposta não for OK, lança um erro com o status.
+                throw new Error(`Falha ao buscar o arquivo. Status: ${response.status} - ${response.statusText}`);
+            }
+            
+            const events = await response.json();
+            console.log("5. Arquivo JSON convertido com sucesso:", events);
+
+            eventsGrid.innerHTML = ''; // Limpa a área
             events.forEach(event => {
                 const card = document.createElement('div');
                 card.className = 'bg-gray-800/50 border border-gray-700 p-6 rounded-lg text-left transform hover:-translate-y-2 transition-transform duration-300 shadow-lg';
@@ -84,16 +95,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 eventsGrid.appendChild(card);
             });
-            lucide.createIcons(); // Recria os ícones após adicionar os eventos
+            
+            console.log("6. Cards de eventos adicionados ao HTML.");
+            lucide.createIcons();
+            console.log("7. Ícones do Lucide renderizados. Processo concluído com SUCESSO!");
             
         } catch (error) {
-            console.error('Erro ao carregar os eventos:', error);
-            eventsGrid.innerHTML = '<p class="text-red-400 col-span-full">Não foi possível carregar os eventos. Verifique a conexão com o back-end.</p>';
+            console.error("ERRO NO PROCESSO DE CARREGAR EVENTOS:", error);
+            eventsGrid.innerHTML = `<p class="text-red-400 col-span-full text-center">Falha ao carregar eventos. Verifique o console (F12) para mais detalhes.</p>`;
         }
     }
     loadEvents();
 
     // --- Lógica do Chat de Suporte com Back-end ---
+    // (O resto do seu código permanece igual)
     const openChatBtn = document.getElementById('open-chat-btn');
     const closeChatBtn = document.getElementById('close-chat-btn');
     const chatWidget = document.getElementById('chat-widget');
@@ -108,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         openChatBtn.addEventListener('click', async () => {
             chatWidget.classList.remove('hidden');
             
-            // Se o socket já estiver conectado e o chat aberto, não faz nada
             if (socket) return;
     
             const userName = prompt("Por favor, digite seu nome ou nick do Discord:");
@@ -129,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 chatId = data.chatId;
     
-                // Conectar ao Socket.IO (certifique-se que o script do socket.io está no HTML)
                 socket = io(API_URL);
     
                 socket.on('connect', () => {
@@ -137,12 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     socket.emit('join-chat', chatId);
                 });
     
-                // Limpar mensagens e adicionar as iniciais
                 chatMessages.innerHTML = '';
                 data.messages.forEach(msg => addMessage(msg.content, msg.sender));
     
                 socket.on('new-message', (msg) => {
-                    // Adiciona a mensagem apenas se o remetente não for o próprio usuário
                     if (msg.sender !== 'user') {
                         addMessage(msg.content, msg.sender);
                     }
@@ -184,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (sender === 'user') {
             messageElement.className = 'p-2 rounded-lg bg-purple-600 self-end text-right max-w-xs break-words';
-        } else { // admin ou sistema
+        } else {
             messageElement.className = 'p-2 rounded-lg bg-gray-700 self-start max-w-xs break-words';
         }
         
