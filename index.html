@@ -41,10 +41,10 @@
             <a href="#inicio" class="text-2xl font-bold tracking-wider hover:text-pink-400 transition-colors">Animes Café ☕</a>
             <nav class="hidden md:flex items-center space-x-8">
                 <a href="#inicio" class="hover:text-pink-400 transition-colors">Início</a>
+                <a href="#guildas" class="hover:text-pink-400 transition-colors">Guildas</a>
                 <a href="#eventos" class="hover:text-pink-400 transition-colors">Eventos</a>
                 <a href="#suporte" class="hover:text-pink-400 transition-colors">Suporte</a>
                 
-                <!-- ÁREA DE LOGIN DINÂMICA (AQUI ESTÁ A MUDANÇA) -->
                 <div id="auth-section">
                     <a href="/auth/discord" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md transition-all duration-300">Login com Discord</a>
                 </div>
@@ -56,11 +56,10 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-gray-900/90 backdrop-blur-sm">
             <a href="#inicio" class="block text-center py-3 hover:bg-purple-700 transition-colors">Início</a>
+            <a href="#guildas" class="block text-center py-3 hover:bg-purple-700 transition-colors">Guildas</a>
             <a href="#eventos" class="block text-center py-3 hover:bg-purple-700 transition-colors">Eventos</a>
             <a href="#suporte" class="block text-center py-3 hover:bg-purple-700 transition-colors">Suporte</a>
-            
-            <!-- LOGIN NO MENU MOBILE (AQUI ESTÁ A OUTRA MUDANÇA) -->
-            <a href="/auth/discord" class="block text-center py-3 bg-purple-600 hover:bg-purple-700 transition-colors">Login com Discord</a>
+            <a href="/auth/discord" id="mobile-login-link" class="block text-center py-3 bg-purple-600 hover:bg-purple-700 transition-colors">Login com Discord</a>
         </div>
     </header>
 
@@ -78,6 +77,35 @@
                 </a>
             </div>
         </section>
+
+        <!-- NOVA SEÇÃO DE GUILDAS -->
+        <section id="guildas" class="py-20 bg-gray-950">
+            <div class="container mx-auto p-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold mb-2">Sistema de <span class="text-green-400">Guildas</span></h2>
+                    <p class="text-gray-400">Crie ou junte-se a uma guilda e compita no ranking de atividade!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+                    <!-- Coluna da Esquerda: Minha Guilda / Criar Guilda -->
+                    <div id="my-guild-section" class="lg:col-span-1 bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <!-- Conteúdo será preenchido pelo JavaScript. 
+                             Mostrará "Crie sua Guilda" ou os detalhes da guilda do usuário. -->
+                        <p class="text-center text-gray-500">Carregando informações da sua guilda...</p>
+                    </div>
+
+                    <!-- Coluna da Direita: Ranking de Guildas -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-2xl font-bold mb-6 text-center lg:text-left">Ranking de Pontos</h3>
+                        <div id="guild-ranking-list" class="flex flex-col gap-4">
+                            <!-- O ranking será preenchido pelo JavaScript -->
+                            <p class="text-center text-gray-500">Carregando ranking...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <!-- Seção de Eventos -->
         <section id="eventos" class="py-20 bg-gray-900">
