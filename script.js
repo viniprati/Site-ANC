@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- LÓGICA DE AUTENTICAÇÃO ---
+    // ==========================================
+    // 1. LÓGICA DE AUTENTICAÇÃO
+    // ==========================================
     async function checkAuthStatus() {
         const authSection = document.getElementById('auth-section');
         const mobileLoginLink = document.getElementById('mobile-login-link');
@@ -39,8 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     checkAuthStatus();
 
-    // --- CÓDIGO ORIGINAL ---
-
+    // ==========================================
+    // 2. BACKGROUND SLIDESHOW & HERO
+    // ==========================================
     const API_URL = 'http://localhost:4000'; 
 
     const backgroundGifs = [
@@ -67,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
     changeBackground();
     setInterval(changeBackground, 5000);
 
+    // ==========================================
+    // 3. MENU MOBILE
+    // ==========================================
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 
@@ -82,6 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ==========================================
+    // 4. CARREGAMENTO DE EVENTOS
+    // ==========================================
     function loadEvents() {
         const events = [
             {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!", "icon": "mic"},
@@ -115,12 +124,221 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadEvents();
 
-    const openChatBtn = document.getElementById('open-chat-btn');
-    const closeChatBtn = document.getElementById('close-chat-btn');
-    const chatWidget = document.getElementById('chat-widget');
-    // ... (resto da inicialização do chat)
+    // ==========================================
+    // 5. CHAT WIDGET (Chatbot Maid Aiko)
+    // ==========================================
+    class AnimesCafeChat {
+        constructor() {
+            // Elementos do DOM
+            this.widget = document.getElementById('chat-widget');
+            this.messagesArea = document.getElementById('chat-messages');
+            this.form = document.getElementById('chat-form');
+            this.input = document.getElementById('chat-input');
+            this.openBtn = document.getElementById('open-chat-btn');
+            this.closeBtn = document.getElementById('close-chat-btn');
+            this.staffBtn = document.getElementById('human-fallback-btn'); // Certifique-se de adicionar este ID no HTML novo
 
-    // --- NOVA LÓGICA DO SISTEMA DE GUILDAS ---
+            // Estado
+            this.isOpen = false;
+            this.isTyping = false;
+            
+            // Persona Config
+            this.botName = "Maid Aiko";
+            this.botAvatar = "coffee"; // Ícone do lucide
+
+            // Inicia apenas se os elementos existirem
+            if (this.widget && this.openBtn) {
+                this.init();
+            }
+        }
+
+        init() {
+            // Event Listeners
+            this.openBtn.addEventListener('click', () => this.toggleChat());
+            if(this.closeBtn) this.closeBtn.addEventListener('click', () => this.toggleChat());
+            if(this.form) this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            
+            // Botão opcional de transbordo (Falar com Humano)
+            if(this.staffBtn) {
+                this.staffBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.triggerStaffHandoff();
+                });
+            }
+
+            // Inicializa com mensagem de boas-vindas se estiver vazio
+            if (this.messagesArea && this.messagesArea.children.length === 0) {
+                this.addMessage("Olá, Mestre! ☕ Bem-vindo ao Animes Café. Sou a Aiko, sua assistente virtual. Como posso servir você hoje?", 'bot');
+            }
+        }
+
+        toggleChat() {
+            this.isOpen = !this.isOpen;
+            
+            if (this.isOpen) {
+                this.widget.classList.remove('hidden');
+                // Pequeno delay para permitir a animação CSS
+                setTimeout(() => {
+                    this.widget.classList.remove('opacity-0', 'translate-y-10');
+                    if(this.input) this.input.focus();
+                }, 10);
+            } else {
+                this.widget.classList.add('opacity-0', 'translate-y-10');
+                setTimeout(() => {
+                    this.widget.classList.add('hidden');
+                }, 300); // Espera a transição acabar
+            }
+        }
+
+        async handleSubmit(e) {
+            e.preventDefault();
+            if(!this.input) return;
+            
+            const text = this.input.value.trim();
+            if (!text) return;
+
+            // 1. Adiciona mensagem do usuário
+            this.addMessage(text, 'user');
+            this.input.value = '';
+
+            // 2. Simula "digitando..."
+            this.showTypingIndicator();
+
+            // 3. Obtém resposta da IA
+            try {
+                const responseText = await this.fetchAIResponse(text);
+                this.removeTypingIndicator();
+                this.addMessage(responseText, 'bot');
+                
+                // Mostra botão de falar com staff após a primeira interação se existir
+                if(this.staffBtn) this.staffBtn.classList.remove('hidden');
+                
+            } catch (error) {
+                this.removeTypingIndicator();
+                this.addMessage("Desculpe, Mestre. Derrubei o café nos circuitos... Pode tentar novamente?", 'bot');
+            }
+        }
+
+        addMessage(text, sender) {
+            const div = document.createElement('div');
+            const isBot = sender === 'bot';
+            
+            div.className = `flex w-full ${isBot ? 'justify-start' : 'justify-end'} mb-4 animate-fade-in-up`;
+
+            div.innerHTML = `
+                <div class="flex max-w-[85%] ${isBot ? 'flex-row' : 'flex-row-reverse'} items-end gap-2">
+                    ${isBot ? `
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="${this.botAvatar}" class="w-4 h-4 text-white"></i>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="px-4 py-2 rounded-2xl text-sm shadow-sm 
+                        ${isBot ? 'bg-gray-700 text-gray-100 rounded-bl-none' : 'bg-blue-600 text-white rounded-br-none'}">
+                        ${this.formatText(text)}
+                    </div>
+                </div>
+            `;
+
+            this.messagesArea.appendChild(div);
+            this.scrollToBottom();
+            if(window.lucide) window.lucide.createIcons();
+        }
+
+        showTypingIndicator() {
+            const id = 'typing-indicator';
+            if (document.getElementById(id)) return;
+
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = `flex w-full justify-start mb-4`;
+            div.innerHTML = `
+                <div class="flex items-end gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i data-lucide="loader-2" class="w-4 h-4 text-white animate-spin"></i>
+                    </div>
+                    <div class="bg-gray-700 px-4 py-3 rounded-2xl rounded-bl-none flex gap-1">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            this.messagesArea.appendChild(div);
+            this.scrollToBottom();
+            if(window.lucide) window.lucide.createIcons();
+        }
+
+        removeTypingIndicator() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        scrollToBottom() {
+            this.messagesArea.scrollTop = this.messagesArea.scrollHeight;
+        }
+
+        formatText(text) {
+            return text.replace(/\n/g, '<br>');
+        }
+
+        triggerStaffHandoff() {
+            this.addMessage("Gostaria de falar com um membro humano da Staff.", 'user');
+            this.showTypingIndicator();
+            
+            setTimeout(() => {
+                this.removeTypingIndicator();
+                const ticketLink = "https://discord.gg/animescafe"; 
+                
+                this.addMessage(`Entendido! Estou chamando um administrador. \n\nPor favor, abra um ticket no nosso Discord clicando abaixo:`, 'bot');
+                
+                const btnDiv = document.createElement('div');
+                btnDiv.className = "flex justify-start mb-4 pl-10";
+                btnDiv.innerHTML = `
+                    <a href="${ticketLink}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-lg">
+                        <i data-lucide="ticket" class="w-4 h-4"></i> Abrir Ticket no Discord
+                    </a>
+                `;
+                this.messagesArea.appendChild(btnDiv);
+                this.scrollToBottom();
+                if(window.lucide) window.lucide.createIcons();
+            }, 1000);
+        }
+
+        // --- LÓGICA DE IA (MOCK / API) ---
+        async fetchAIResponse(userText) {
+            // Simula delay de rede
+            await new Promise(r => setTimeout(r, 1000));
+
+            // [INTEGRAÇÃO FUTURA]: Aqui você colocará sua chamada para OpenAI / Gemini
+            // const API_KEY = 'SUA_CHAVE'; ... fetch ...
+            
+            // Respostas Mockadas (Falsas)
+            const lowerText = userText.toLowerCase();
+
+            if (lowerText.includes('ola') || lowerText.includes('oi')) {
+                return "Olá! 🌸 O aroma do café está ótimo hoje. Como posso te ajudar no servidor?";
+            }
+            if (lowerText.includes('regras')) {
+                return "Para manter o café agradável: Respeite a todos, sem spam e sem conteúdo NSFW. Veja o canal #regras no Discord!";
+            }
+            if (lowerText.includes('guilda') || lowerText.includes('clã')) {
+                return "Você pode criar ou entrar em Guildas na aba 'Guildas' do site! Elas servem para competir no ranking de atividade.";
+            }
+            if (lowerText.includes('evento')) {
+                return "Confira a seção de Eventos acima! Temos karaokê e campeonatos agendados.";
+            }
+            
+            return "Hmm... Ainda estou aprendendo sobre isso. Gostaria de falar com um Staff humano?";
+        }
+    }
+
+    // Instancia o Chat
+    const chatApp = new AnimesCafeChat();
+
+    // ==========================================
+    // 6. SISTEMA DE GUILDAS
+    // ==========================================
     const myGuildSection = document.getElementById('my-guild-section');
     const guildRankingList = document.getElementById('guild-ranking-list');
 
@@ -224,42 +442,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    myGuildSection.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (e.target.id === 'create-guild-form') {
-            const guildNameInput = document.getElementById('guild-name-input');
-            const guildName = guildNameInput.value;
-            const response = await fetch('/api/guilds', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: guildName }),
-            });
-            if (response.ok) {
-                loadMyGuildStatus();
-                loadGuildRanking();
-            } else {
-                const data = await response.json();
-                alert(`Erro: ${data.error}`);
+    if(myGuildSection) {
+        myGuildSection.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (e.target.id === 'create-guild-form') {
+                const guildNameInput = document.getElementById('guild-name-input');
+                const guildName = guildNameInput.value;
+                const response = await fetch('/api/guilds', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: guildName }),
+                });
+                if (response.ok) {
+                    loadMyGuildStatus();
+                    loadGuildRanking();
+                } else {
+                    const data = await response.json();
+                    alert(`Erro: ${data.error}`);
+                }
             }
-        }
 
-        if (e.target.id === 'add-member-form') {
-            const newMemberIdInput = document.getElementById('new-member-id-input');
-            const newMemberId = newMemberIdInput.value;
-            const guildId = e.target.dataset.guildId;
-            const response = await fetch(`/api/guilds/${guildId}/members`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ newMemberId }),
-            });
-            if (response.ok) {
-                loadMyGuildStatus();
-            } else {
-                const data = await response.json();
-                alert(`Erro: ${data.error}`);
+            if (e.target.id === 'add-member-form') {
+                const newMemberIdInput = document.getElementById('new-member-id-input');
+                const newMemberId = newMemberIdInput.value;
+                const guildId = e.target.dataset.guildId;
+                const response = await fetch(`/api/guilds/${guildId}/members`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newMemberId }),
+                });
+                if (response.ok) {
+                    loadMyGuildStatus();
+                } else {
+                    const data = await response.json();
+                    alert(`Erro: ${data.error}`);
+                }
             }
-        }
-    });
+        });
+    }
 
     loadMyGuildStatus();
     loadGuildRanking();
