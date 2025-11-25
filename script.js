@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
 
     // ==========================================
-    // 5. CHAT WIDGET (Chatbot Maid Aiko) - ATUALIZADO
+    // 5. CHAT WIDGET (Chatbot Maid Aiko)
     // ==========================================
     class AnimesCafeChat {
         constructor() {
@@ -217,6 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
         openChat() {
             this.isOpen = true;
             this.widget.classList.remove('hidden');
+
+            // Correção: Força o carregamento dos ícones ao abrir para garantir que o 'X' apareça
+            if(window.lucide) window.lucide.createIcons();
+
             setTimeout(() => {
                 this.widget.classList.remove('opacity-0', 'translate-y-10');
                 if(this.input) this.input.focus();
