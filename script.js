@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+    console.log(">>> SITE INICIADO: Carregando módulos...");
+
+    // Inicializa ícones do Lucide se estiverem disponíveis
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
     // ==========================================
     // 1. LÓGICA DE AUTENTICAÇÃO
     // ==========================================
@@ -7,12 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const authSection = document.getElementById('auth-section');
         const mobileLoginLink = document.getElementById('mobile-login-link');
 
-        if (!authSection) {
-            console.error("Elemento 'auth-section' não encontrado no HTML.");
-            return;
-        }
+        if (!authSection) return;
 
         try {
+            // Tenta verificar sessão. Se o backend não estiver rodando, vai cair no catch.
             const response = await fetch('/api/me');
             if (response.ok) {
                 const user = await response.json();
@@ -36,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            console.error("Não foi possível verificar o status de autenticação:", error);
+            // Silencia o erro no console se não houver backend
         }
     }
     checkAuthStatus();
@@ -44,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 2. BACKGROUND SLIDESHOW & HERO
     // ==========================================
-    const API_URL = 'http://localhost:4000'; 
-
+    const heroSection = document.getElementById('inicio');
     const backgroundGifs = [
         'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGd1OHVpcTN4cTJydWR4b3BwaXBmYnkydnRnMjFsd2E1NTVpbm00ZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iqkCNZIzSSXSM/giphy.gif',
         'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3enlseDl5ZHI2bXB4M2phNDNwZmxycWY3bG01cXd5d2FteDU5djRrcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/tyttpHjP5GSOvJm903e/giphy.gif',
@@ -53,22 +56,23 @@ document.addEventListener('DOMContentLoaded', () => {
         'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3o5NGxvbms2NmEzNWRyZTl3YmhsdTQ1Y3d5Y291aGU4N2xjZHcwciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/37IzUsLdfChayL5uyA/giphy.gif',
         'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXB4aHpxM3V2OHZ1MzhvMGVhOHlwOHZnZThleGNpa3Y2ZGgwaWdiYSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/dyjrpqaUVqCELGuQVr/giphy.gif'
     ];
-
-    const heroSection = document.getElementById('inicio');
     let currentGifIndex = 0;
 
     function changeBackground() {
         if (!heroSection) return;
         const nextIndex = (currentGifIndex + 1) % backgroundGifs.length;
+        
         const img = new Image();
         img.src = backgroundGifs[nextIndex];
 
         heroSection.style.backgroundImage = `url('${backgroundGifs[currentGifIndex]}')`;
-        currentGifIndex = (currentGifIndex + 1) % backgroundGifs.length;
+        currentGifIndex = nextIndex;
     }
 
-    changeBackground();
-    setInterval(changeBackground, 5000);
+    if (heroSection) {
+        changeBackground();
+        setInterval(changeBackground, 5000);
+    }
 
     // ==========================================
     // 3. MENU MOBILE
@@ -120,12 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
             eventsGrid.appendChild(card);
         }
         
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
     }
     loadEvents();
 
     // ==========================================
-    // 5. CHAT WIDGET (Chatbot Maid Aiko)
+    // 5. CHAT WIDGET (Chatbot Maid Aiko) - ATUALIZADO
     // ==========================================
     class AnimesCafeChat {
         constructor() {
@@ -136,29 +140,59 @@ document.addEventListener('DOMContentLoaded', () => {
             this.input = document.getElementById('chat-input');
             this.openBtn = document.getElementById('open-chat-btn');
             this.closeBtn = document.getElementById('close-chat-btn');
-            this.staffBtn = document.getElementById('human-fallback-btn'); // Certifique-se de adicionar este ID no HTML novo
+            this.staffBtn = document.getElementById('human-fallback-btn');
 
             // Estado
             this.isOpen = false;
-            this.isTyping = false;
-            
-            // Persona Config
             this.botName = "Maid Aiko";
-            this.botAvatar = "coffee"; // Ícone do lucide
+            this.botAvatar = "coffee";
 
-            // Inicia apenas se os elementos existirem
+            // Inicia apenas se o botão de abrir e o widget existirem
             if (this.widget && this.openBtn) {
                 this.init();
+            } else {
+                console.warn("Chat Widget: Elementos não encontrados. O chat não será iniciado.");
             }
         }
 
         init() {
-            // Event Listeners
-            this.openBtn.addEventListener('click', () => this.toggleChat());
-            if(this.closeBtn) this.closeBtn.addEventListener('click', () => this.toggleChat());
-            if(this.form) this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            // 1. Botão de Abrir
+            this.openBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Impede conflito com clique fora
+                this.toggleChat();
+            });
+
+            // 2. Botão de Fechar (X)
+            if(this.closeBtn) {
+                this.closeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.closeChat();
+                });
+            }
+
+            // 3. Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (this.isOpen && 
+                    !this.widget.contains(e.target) && 
+                    !this.openBtn.contains(e.target)) {
+                    this.closeChat();
+                }
+            });
+
+            // 4. Fechar com tecla ESC
+            document.addEventListener('keydown', (e) => {
+                if (this.isOpen && e.key === 'Escape') {
+                    this.closeChat();
+                }
+            });
+
+            // Envio do Form
+            if(this.form) {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
             
-            // Botão opcional de transbordo (Falar com Humano)
+            // Botão Staff
             if(this.staffBtn) {
                 this.staffBtn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -166,28 +200,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Inicializa com mensagem de boas-vindas se estiver vazio
+            // Mensagem de boas-vindas
             if (this.messagesArea && this.messagesArea.children.length === 0) {
                 this.addMessage("Olá, Mestre! ☕ Bem-vindo ao Animes Café. Sou a Aiko, sua assistente virtual. Como posso servir você hoje?", 'bot');
             }
         }
 
         toggleChat() {
-            this.isOpen = !this.isOpen;
-            
             if (this.isOpen) {
-                this.widget.classList.remove('hidden');
-                // Pequeno delay para permitir a animação CSS
-                setTimeout(() => {
-                    this.widget.classList.remove('opacity-0', 'translate-y-10');
-                    if(this.input) this.input.focus();
-                }, 10);
+                this.closeChat();
             } else {
-                this.widget.classList.add('opacity-0', 'translate-y-10');
-                setTimeout(() => {
-                    this.widget.classList.add('hidden');
-                }, 300); // Espera a transição acabar
+                this.openChat();
             }
+        }
+
+        openChat() {
+            this.isOpen = true;
+            this.widget.classList.remove('hidden');
+            setTimeout(() => {
+                this.widget.classList.remove('opacity-0', 'translate-y-10');
+                if(this.input) this.input.focus();
+            }, 10);
+        }
+
+        closeChat() {
+            this.isOpen = false;
+            this.widget.classList.add('opacity-0', 'translate-y-10');
+            setTimeout(() => {
+                this.widget.classList.add('hidden');
+            }, 300);
         }
 
         async handleSubmit(e) {
@@ -197,20 +238,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = this.input.value.trim();
             if (!text) return;
 
-            // 1. Adiciona mensagem do usuário
+            // 1. Mensagem Usuário
             this.addMessage(text, 'user');
             this.input.value = '';
 
-            // 2. Simula "digitando..."
+            // 2. Typing Indicator
             this.showTypingIndicator();
 
-            // 3. Obtém resposta da IA
+            // 3. Resposta da IA (Mock ou API)
             try {
                 const responseText = await this.fetchAIResponse(text);
                 this.removeTypingIndicator();
                 this.addMessage(responseText, 'bot');
                 
-                // Mostra botão de falar com staff após a primeira interação se existir
                 if(this.staffBtn) this.staffBtn.classList.remove('hidden');
                 
             } catch (error) {
@@ -305,15 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         }
 
-        // --- LÓGICA DE IA (MOCK / API) ---
+        // --- LÓGICA DE IA (MOCK) ---
         async fetchAIResponse(userText) {
-            // Simula delay de rede
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 1000)); // Delay simulado
 
-            // [INTEGRAÇÃO FUTURA]: Aqui você colocará sua chamada para OpenAI / Gemini
-            // const API_KEY = 'SUA_CHAVE'; ... fetch ...
-            
-            // Respostas Mockadas (Falsas)
             const lowerText = userText.toLowerCase();
 
             if (lowerText.includes('ola') || lowerText.includes('oi')) {
@@ -388,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </ul>
             ${addMemberForm}
         `;
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
     }
 
     async function loadMyGuildStatus() {
@@ -396,7 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const meResponse = await fetch('/api/me');
             if (!meResponse.ok) {
-                myGuildSection.innerHTML = '<p class="text-center text-gray-400">Faça login para criar ou ver sua guilda.</p>';
+                // Se não estiver logado, mostra aviso
+                myGuildSection.innerHTML = '<p class="text-center text-gray-400 mt-4">Faça login para criar ou ver sua guilda.</p>';
                 return;
             }
             const currentUser = await meResponse.json();
@@ -412,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Erro ao carregar status da guilda:", error);
-            myGuildSection.innerHTML = '<p class="text-red-500">Erro ao carregar informações.</p>';
+            myGuildSection.innerHTML = '<p class="text-red-500">Erro de conexão com o sistema de guildas.</p>';
         }
     }
 
@@ -438,7 +474,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         } catch (error) {
             console.error("Erro ao carregar ranking de guildas:", error);
-            guildRankingList.innerHTML = '<p class="text-red-500">Erro ao carregar ranking.</p>';
+            // Mensagem amigável de fallback
+            guildRankingList.innerHTML = '<p class="text-gray-500">Ranking indisponível no momento.</p>';
         }
     }
 
@@ -448,39 +485,44 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.id === 'create-guild-form') {
                 const guildNameInput = document.getElementById('guild-name-input');
                 const guildName = guildNameInput.value;
-                const response = await fetch('/api/guilds', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: guildName }),
-                });
-                if (response.ok) {
-                    loadMyGuildStatus();
-                    loadGuildRanking();
-                } else {
-                    const data = await response.json();
-                    alert(`Erro: ${data.error}`);
-                }
+                try {
+                    const response = await fetch('/api/guilds', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: guildName }),
+                    });
+                    if (response.ok) {
+                        loadMyGuildStatus();
+                        loadGuildRanking();
+                    } else {
+                        const data = await response.json();
+                        alert(`Erro: ${data.error}`);
+                    }
+                } catch(e) { console.error(e); }
             }
 
             if (e.target.id === 'add-member-form') {
                 const newMemberIdInput = document.getElementById('new-member-id-input');
                 const newMemberId = newMemberIdInput.value;
                 const guildId = e.target.dataset.guildId;
-                const response = await fetch(`/api/guilds/${guildId}/members`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ newMemberId }),
-                });
-                if (response.ok) {
-                    loadMyGuildStatus();
-                } else {
-                    const data = await response.json();
-                    alert(`Erro: ${data.error}`);
-                }
+                try {
+                    const response = await fetch(`/api/guilds/${guildId}/members`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ newMemberId }),
+                    });
+                    if (response.ok) {
+                        loadMyGuildStatus();
+                    } else {
+                        const data = await response.json();
+                        alert(`Erro: ${data.error}`);
+                    }
+                } catch(e) { console.error(e); }
             }
         });
     }
 
+    // Carrega dados iniciais das Guildas
     loadMyGuildStatus();
     loadGuildRanking();
 });

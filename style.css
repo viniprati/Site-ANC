@@ -6,7 +6,7 @@
     transition: background-image 1.5s ease-in-out;
 }
 
-/* Animação para os elementos entrarem na tela */
+/* Animação para os elementos entrarem na tela (Fade In Up) */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -22,6 +22,7 @@
     animation: fadeInUp 0.8s ease-out forwards;
 }
 
+/* Animação de deslizar para cima (Slide In Up) */
 @keyframes slideInUp {
     from {
         transform: translateY(100%);
@@ -36,6 +37,7 @@
 .animate-slide-in-up {
     animation: slideInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
+
 /* Scrollbar personalizada para o chat */
 .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
