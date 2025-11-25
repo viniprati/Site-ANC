@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!authSection) return;
 
         try {
-            // Tenta verificar sessão. Se o backend não estiver rodando, vai cair no catch.
             const response = await fetch('/api/me');
             if (response.ok) {
                 const user = await response.json();
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            // Silencia o erro no console se não houver backend
+            // Silencia erro de backend offline
         }
     }
     checkAuthStatus();
@@ -85,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileMenu.classList.toggle('hidden');
         });
         
-        for (const link of mobileMenu.querySelectorAll('a')) {
+        mobileMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
             });
-        }
+        });
     }
 
     // ==========================================
@@ -97,9 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     function loadEvents() {
         const events = [
-            {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!", "icon": "mic"},
-            {"name": "Campeonato de LoL", "date": "15 de Março, 14:00", "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.", "icon": "swords"},
-            {"name": "Maratona Ghibli", "date": "22 de Março, 18:00", "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.", "icon": "film"}
+            {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes.", "icon": "mic"},
+            {"name": "Campeonato de LoL", "date": "15 de Março, 14:00", "description": "Mostre suas habilidades no Rift! Inscrições abertas.", "icon": "swords"},
+            {"name": "Maratona Ghibli", "date": "22 de Março, 18:00", "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli.", "icon": "film"}
         ];
 
         const eventsGrid = document.getElementById('events-grid');
@@ -129,11 +128,99 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
 
     // ==========================================
-    // 5. CHAT WIDGET (Chatbot Maid Aiko)
+    // 5. SISTEMA DE FAQ (VISUAL NO SITE)
+    // ==========================================
+    function loadFAQ() {
+        const faqContainer = document.getElementById('faq-list');
+        if (!faqContainer) return;
+
+        const faqData = [
+            {
+                "question": "Como faço para entrar no servidor do Discord?",
+                "answer": "É super simples! Basta clicar no botão de convite aqui no site ou usar nosso link direto. Assim que entrar, lembre-se de ler e aceitar as normas no canal <b>#regras</b> para liberar seu acesso aos chats."
+            },
+            {
+                "question": "Como posso criar minha própria Guilda?",
+                "answer": "Para fundar uma Guilda, você deve entrar em contato com um membro da nossa Staff. Lembre-se que você poderá adicionar até <b>9 outros membros</b> para fazer parte da sua equipe."
+            },
+            {
+                "question": "Quais são os horários dos eventos?",
+                "answer": "Nossos eventos geralmente acontecem aos finais de semana e no período noturno durante a semana. Fique sempre de olho no canal <b>#anúncios</b> e na aba de Eventos do Discord para não perder nada!"
+            },
+            {
+                "question": "Quero fazer parte da Staff, como me inscrevo?",
+                "answer": "Adoramos seu interesse! Escolha a área que mais combina com você e preencha o formulário: <br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Moderação</a></b><br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Movimentação</a></b><br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Parcerias</a></b>"
+            },
+            {
+                "question": "Fui banido, como posso pedir revisão?",
+                "answer": "Não se preocupe em procurar o link. Se o banimento ocorrer, nosso sistema envia <b>automaticamente o formulário de revisão no seu privado (PV)</b>. Basta verificar suas mensagens diretas, preencher e aguardar."
+            },
+            {
+                "question": "Como funcionam as parcerias com o Animes Café?",
+                "answer": "Adoramos conectar comunidades! Verifique se seu servidor ou projeto cumpre os requisitos listados no canal <b>#parcerias</b> e abra um ticket para apresentarmos nossas propostas."
+            },
+            {
+                "question": "Quais as vantagens de dar Boost no servidor?",
+                "answer": "Temos dois níveis incríveis! Com <b>1 Boost</b>, você ganha VIP, troca de apelido, mídias liberadas, 5x XP (Loritta), GarticMOD e mais. Com <b>2+ Boosts (Premium)</b>, você leva tudo isso mais um <b>cargo customizado para 20 amigos</b>, 10x XP, cores exclusivas e áudio no lobby!"
+            },
+            {
+                "question": "Quais bots de música estão disponíveis?",
+                "answer": "Para garantir a trilha sonora perfeita, contamos com o <b>Jockie Music</b> e o <b>Samzinho</b>. Basta entrar em um canal de voz de música e usar os comandos para soltar o som!"
+            },
+            {
+                "question": "Vi alguém quebrando as regras, como denuncio?",
+                "answer": "A segurança é prioridade. Se presenciar algo errado, abra imediatamente um <b>Ticket de Suporte</b> ou contate um moderador online. Prints e provas ajudam muito na agilidade da resolução."
+            },
+            {
+                "question": "Sou Artista ou Influenciador, tenho algum destaque?",
+                "answer": "Com certeza! Temos apoio para verificados como <b>Streamer, Cantor, Produtor, Influenciador, Editor e Designer</b>. Para conseguir seu cargo, basta abrir um ticket. Confira os requisitos no canal: <a href='#' class='text-pink-400 hover:underline'><b>Cargos Especiais</b></a>."
+            }
+        ];
+
+        faqContainer.innerHTML = faqData.map((item, index) => `
+            <div class="group border border-gray-800 rounded-xl bg-gray-900/50 overflow-hidden transition-all duration-300 hover:border-pink-500/50 hover:bg-gray-900">
+                <button class="faq-btn w-full flex justify-between items-center p-5 text-left focus:outline-none" onclick="toggleFAQ(${index})">
+                    <span class="text-lg font-semibold text-gray-200 group-hover:text-pink-400 transition-colors pr-4">${item.question}</span>
+                    <i data-lucide="chevron-down" id="icon-${index}" class="w-5 h-5 text-gray-500 transition-transform duration-300 flex-shrink-0"></i>
+                </button>
+                <div id="content-${index}" class="hidden px-5 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800/50 mt-2 pt-4">
+                    ${item.answer}
+                </div>
+            </div>
+        `).join('');
+
+        window.toggleFAQ = function(index) {
+            const content = document.getElementById(`content-${index}`);
+            const icon = document.getElementById(`icon-${index}`);
+            
+            // Fecha os outros (opcional)
+            faqData.forEach((_, i) => {
+                if (i !== index) {
+                    document.getElementById(`content-${i}`).classList.add('hidden');
+                    document.getElementById(`icon-${i}`).classList.remove('rotate-180', 'text-pink-400');
+                }
+            });
+
+            const isHidden = content.classList.contains('hidden');
+            if (isHidden) {
+                content.classList.remove('hidden');
+                content.classList.add('animate-fade-in-up');
+                icon.classList.add('rotate-180', 'text-pink-400');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180', 'text-pink-400');
+            }
+        };
+
+        if (window.lucide) lucide.createIcons();
+    }
+    loadFAQ();
+
+    // ==========================================
+    // 6. CHAT WIDGET (CHATBOT HÍBRIDO)
     // ==========================================
     class AnimesCafeChat {
         constructor() {
-            // Elementos do DOM
             this.widget = document.getElementById('chat-widget');
             this.messagesArea = document.getElementById('chat-messages');
             this.form = document.getElementById('chat-form');
@@ -142,28 +229,23 @@ document.addEventListener('DOMContentLoaded', () => {
             this.closeBtn = document.getElementById('close-chat-btn');
             this.staffBtn = document.getElementById('human-fallback-btn');
 
-            // Estado
             this.isOpen = false;
             this.botName = "Maid Aiko";
             this.botAvatar = "coffee";
 
-            // Inicia apenas se o botão de abrir e o widget existirem
             if (this.widget && this.openBtn) {
                 this.init();
-            } else {
-                console.warn("Chat Widget: Elementos não encontrados. O chat não será iniciado.");
             }
         }
 
         init() {
-            // 1. Botão de Abrir
+            // Eventos de Abrir/Fechar
             this.openBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Impede conflito com clique fora
+                e.stopPropagation();
                 this.toggleChat();
             });
 
-            // 2. Botão de Fechar (X)
             if(this.closeBtn) {
                 this.closeBtn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -171,28 +253,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // 3. Fechar ao clicar fora
+            // Fechar ao clicar fora
             document.addEventListener('click', (e) => {
-                if (this.isOpen && 
-                    !this.widget.contains(e.target) && 
-                    !this.openBtn.contains(e.target)) {
+                if (this.isOpen && !this.widget.contains(e.target) && !this.openBtn.contains(e.target)) {
                     this.closeChat();
                 }
             });
 
-            // 4. Fechar com tecla ESC
+            // Fechar com ESC
             document.addEventListener('keydown', (e) => {
                 if (this.isOpen && e.key === 'Escape') {
                     this.closeChat();
                 }
             });
 
-            // Envio do Form
+            // Envio de mensagem
             if(this.form) {
                 this.form.addEventListener('submit', (e) => this.handleSubmit(e));
             }
             
-            // Botão Staff
+            // Botão Falar com Staff
             if(this.staffBtn) {
                 this.staffBtn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -200,25 +280,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Mensagem de boas-vindas
+            // Mensagem Inicial
             if (this.messagesArea && this.messagesArea.children.length === 0) {
-                this.addMessage("Olá, Mestre! ☕ Bem-vindo ao Animes Café. Sou a Aiko, sua assistente virtual. Como posso servir você hoje?", 'bot');
+                this.addMessage("Olá, Mestre! ☕ Bem-vindo ao Animes Café. Sou a Aiko. Como posso servir você hoje?", 'bot');
             }
         }
 
         toggleChat() {
-            if (this.isOpen) {
-                this.closeChat();
-            } else {
-                this.openChat();
-            }
+            if (this.isOpen) this.closeChat();
+            else this.openChat();
         }
 
         openChat() {
             this.isOpen = true;
             this.widget.classList.remove('hidden');
-
-            // Correção: Força o carregamento dos ícones ao abrir para garantir que o 'X' apareça
+            
+            // Força a renderização dos ícones (importante para o botão X aparecer)
             if(window.lucide) window.lucide.createIcons();
 
             setTimeout(() => {
@@ -249,18 +326,63 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Typing Indicator
             this.showTypingIndicator();
 
-            // 3. Resposta da IA (Mock ou API)
-            try {
-                const responseText = await this.fetchAIResponse(text);
-                this.removeTypingIndicator();
-                this.addMessage(responseText, 'bot');
-                
-                if(this.staffBtn) this.staffBtn.classList.remove('hidden');
-                
-            } catch (error) {
-                this.removeTypingIndicator();
-                this.addMessage("Desculpe, Mestre. Derrubei o café nos circuitos... Pode tentar novamente?", 'bot');
+            // --- LÓGICA HÍBRIDA ---
+            // Tenta responder com as FAQs primeiro (Custo Zero)
+            const localResponse = this.checkLocalFAQ(text);
+
+            if (localResponse) {
+                setTimeout(() => {
+                    this.removeTypingIndicator();
+                    this.addMessage(localResponse, 'bot');
+                }, 600);
+            } else {
+                // Se não sabe, chama a API (Simulada)
+                try {
+                    const responseText = await this.fetchAIResponse(text);
+                    this.removeTypingIndicator();
+                    this.addMessage(responseText, 'bot');
+                    if(this.staffBtn) this.staffBtn.classList.remove('hidden');
+                } catch (error) {
+                    this.removeTypingIndicator();
+                    this.addMessage("Desculpe, tive um problema técnico.", 'bot');
+                }
             }
+        }
+
+        // "Cérebro Local" da IA (Baseado nas FAQs)
+        checkLocalFAQ(text) {
+            const lower = text.toLowerCase();
+            
+            if (lower.includes('entrar') || lower.includes('convite') || lower.includes('link')) 
+                return "Para entrar, clique no botão 'Entrar no Servidor' no topo da página ou use este link: discord.gg/animescafe ☕";
+            
+            if (lower.includes('guilda') || lower.includes('clã') || lower.includes('time')) 
+                return "As Guildas são o coração do Café! Você pode criar a sua falando com a Staff ou entrar em uma existente. Elas competem por pontos!";
+            
+            if (lower.includes('regras') || lower.includes('pode fazer')) 
+                return "Respeito acima de tudo! Sem spam, sem flood e conteúdo NSFW apenas nos canais permitidos. Leia tudo em #regras.";
+            
+            if (lower.includes('staff') || lower.includes('moderador') || lower.includes('adm')) 
+                return "Quer fazer parte da equipe? Fique de olho no canal #anúncios para quando abrirmos os formulários de recrutamento!";
+            
+            if (lower.includes('banido') || lower.includes('ban')) 
+                return "Se você foi banido, nosso bot envia automaticamente o formulário de revisão no seu privado (PV).";
+            
+            if (lower.includes('boost') || lower.includes('nitro')) 
+                return "Boosters ganham vantagens incríveis como XP extra, cargos personalizados, cores exclusivas e prioridade em eventos! 💎";
+            
+            if (lower.includes('parceria')) 
+                return "Para parcerias, verifique os requisitos no canal #parcerias e abra um ticket!";
+            
+            if (lower.includes('oi') || lower.includes('olá') || lower.includes('bom dia') || lower.includes('boa noite')) 
+                return "Olá! 🌸 Tudo bem com você? Aceita um chá ou café?";
+
+            return null; // Não encontrou resposta local, passa para a IA
+        }
+
+        async fetchAIResponse(userText) {
+            await new Promise(r => setTimeout(r, 1500)); // Delay simulado
+            return "Hmm... essa dúvida é bem específica. 🤔 Gostaria de falar com um membro humano da Staff para te ajudar melhor?";
         }
 
         addMessage(text, sender) {
@@ -279,22 +401,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div class="px-4 py-2 rounded-2xl text-sm shadow-sm 
                         ${isBot ? 'bg-gray-700 text-gray-100 rounded-bl-none' : 'bg-blue-600 text-white rounded-br-none'}">
-                        ${this.formatText(text)}
+                        ${text.replace(/\n/g, '<br>')}
                     </div>
                 </div>
             `;
 
             this.messagesArea.appendChild(div);
-            this.scrollToBottom();
+            this.messagesArea.scrollTop = this.messagesArea.scrollHeight;
             if(window.lucide) window.lucide.createIcons();
         }
 
         showTypingIndicator() {
-            const id = 'typing-indicator';
-            if (document.getElementById(id)) return;
-
+            if (document.getElementById('typing-indicator')) return;
             const div = document.createElement('div');
-            div.id = id;
+            div.id = 'typing-indicator';
             div.className = `flex w-full justify-start mb-4`;
             div.innerHTML = `
                 <div class="flex items-end gap-2">
@@ -309,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             this.messagesArea.appendChild(div);
-            this.scrollToBottom();
+            this.messagesArea.scrollTop = this.messagesArea.scrollHeight;
             if(window.lucide) window.lucide.createIcons();
         }
 
@@ -318,57 +438,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el) el.remove();
         }
 
-        scrollToBottom() {
-            this.messagesArea.scrollTop = this.messagesArea.scrollHeight;
-        }
-
-        formatText(text) {
-            return text.replace(/\n/g, '<br>');
-        }
-
         triggerStaffHandoff() {
             this.addMessage("Gostaria de falar com um membro humano da Staff.", 'user');
             this.showTypingIndicator();
             
             setTimeout(() => {
                 this.removeTypingIndicator();
-                const ticketLink = "https://discord.gg/animescafe"; 
-                
-                this.addMessage(`Entendido! Estou chamando um administrador. \n\nPor favor, abra um ticket no nosso Discord clicando abaixo:`, 'bot');
-                
-                const btnDiv = document.createElement('div');
-                btnDiv.className = "flex justify-start mb-4 pl-10";
-                btnDiv.innerHTML = `
-                    <a href="${ticketLink}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-lg">
-                        <i data-lucide="ticket" class="w-4 h-4"></i> Abrir Ticket no Discord
-                    </a>
-                `;
-                this.messagesArea.appendChild(btnDiv);
-                this.scrollToBottom();
-                if(window.lucide) window.lucide.createIcons();
+                this.addMessage(`Entendido! <a href="https://discord.gg/animescafe" target="_blank" class="text-blue-400 underline font-bold">Clique aqui para abrir um Ticket no Discord</a>.`, 'bot');
             }, 1000);
-        }
-
-        // --- LÓGICA DE IA (MOCK) ---
-        async fetchAIResponse(userText) {
-            await new Promise(r => setTimeout(r, 1000)); // Delay simulado
-
-            const lowerText = userText.toLowerCase();
-
-            if (lowerText.includes('ola') || lowerText.includes('oi')) {
-                return "Olá! 🌸 O aroma do café está ótimo hoje. Como posso te ajudar no servidor?";
-            }
-            if (lowerText.includes('regras')) {
-                return "Para manter o café agradável: Respeite a todos, sem spam e sem conteúdo NSFW. Veja o canal #regras no Discord!";
-            }
-            if (lowerText.includes('guilda') || lowerText.includes('clã')) {
-                return "Você pode criar ou entrar em Guildas na aba 'Guildas' do site! Elas servem para competir no ranking de atividade.";
-            }
-            if (lowerText.includes('evento')) {
-                return "Confira a seção de Eventos acima! Temos karaokê e campeonatos agendados.";
-            }
-            
-            return "Hmm... Ainda estou aprendendo sobre isso. Gostaria de falar com um Staff humano?";
         }
     }
 
@@ -376,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatApp = new AnimesCafeChat();
 
     // ==========================================
-    // 6. SISTEMA DE GUILDAS
+    // 7. SISTEMA DE GUILDAS (BACKEND)
     // ==========================================
     const myGuildSection = document.getElementById('my-guild-section');
     const guildRankingList = document.getElementById('guild-ranking-list');
@@ -435,7 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const meResponse = await fetch('/api/me');
             if (!meResponse.ok) {
-                // Se não estiver logado, mostra aviso
                 myGuildSection.innerHTML = '<p class="text-center text-gray-400 mt-4">Faça login para criar ou ver sua guilda.</p>';
                 return;
             }
@@ -452,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Erro ao carregar status da guilda:", error);
-            myGuildSection.innerHTML = '<p class="text-red-500">Erro de conexão com o sistema de guildas.</p>';
+            myGuildSection.innerHTML = '<p class="text-red-500">Erro de conexão.</p>';
         }
     }
 
@@ -478,8 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         } catch (error) {
             console.error("Erro ao carregar ranking de guildas:", error);
-            // Mensagem amigável de fallback
-            guildRankingList.innerHTML = '<p class="text-gray-500">Ranking indisponível no momento.</p>';
+            guildRankingList.innerHTML = '<p class="text-gray-500">Ranking indisponível.</p>';
         }
     }
 
@@ -526,7 +601,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Carrega dados iniciais das Guildas
     loadMyGuildStatus();
     loadGuildRanking();
 });
