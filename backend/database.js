@@ -3,7 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 // O nome do arquivo do banco de dados. Ele será criado na pasta 'backend'.
 const dbFile = './guilds.db';
 
-// Conecta ao banco de dados SQLite. O arquivo será criado se não existir.
+// Conecta ao banco de dados SQLite.
 const db = new sqlite3.Database(dbFile, (err) => {
     if (err) {
         return console.error("Erro ao abrir o banco de dados:", err.message);
@@ -13,8 +13,8 @@ const db = new sqlite3.Database(dbFile, (err) => {
 
 // Envolve a criação das tabelas em db.serialize para garantir que rodem em ordem
 db.serialize(() => {
-    // Tabela para as Guildas
-    // Usa crases (`) para permitir que a string ocupe várias linhas
+    
+    // 1. Tabela para as Guildas
     db.run(`
         CREATE TABLE IF NOT EXISTS guilds (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,17 +27,35 @@ db.serialize(() => {
         console.log("Tabela 'guilds' verificada/criada com sucesso.");
     });
 
-    // Tabela para os Membros das Guildas
+    // 2. Tabela para os Membros das Guildas
     db.run(`
         CREATE TABLE IF NOT EXISTS members (
             user_id TEXT NOT NULL,
             guild_id INTEGER NOT NULL,
+            role TEXT DEFAULT 'member',
             PRIMARY KEY (user_id),
             FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
         )
     `, (err) => {
         if (err) return console.error("Erro ao criar tabela 'members':", err.message);
         console.log("Tabela 'members' verificada/criada com sucesso.");
+    });
+
+    // 3. NOVA TABELA: Convites Pendentes (Invites)
+    // Aqui ficam os pedidos antes da pessoa aceitar
+    db.run(`
+        CREATE TABLE IF NOT EXISTS invites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guild_id INTEGER NOT NULL,
+            sender_id TEXT NOT NULL,
+            receiver_id TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE
+        )
+    `, (err) => {
+        if (err) return console.error("Erro ao criar tabela 'invites':", err.message);
+        console.log("Tabela 'invites' verificada/criada com sucesso.");
     });
 });
 
