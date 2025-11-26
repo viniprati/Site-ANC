@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!authSection) return;
 
         try {
+            // Tenta verificar sessão. Se o backend não estiver rodando, vai cair no catch.
             const response = await fetch('/api/me');
             if (response.ok) {
                 const user = await response.json();
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            // Silencia erro de backend offline
+            // Silencia o erro no console se não houver backend
         }
     }
     checkAuthStatus();
@@ -96,9 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     function loadEvents() {
         const events = [
-            {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes.", "icon": "mic"},
-            {"name": "Campeonato de LoL", "date": "15 de Março, 14:00", "description": "Mostre suas habilidades no Rift! Inscrições abertas.", "icon": "swords"},
-            {"name": "Maratona Ghibli", "date": "22 de Março, 18:00", "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli.", "icon": "film"}
+            {"name": "Noite de Karaokê Anime", "date": "Toda Sexta, 20:00", "description": "Solte a voz com as melhores aberturas e encerramentos de animes. Venha cantar conosco!", "icon": "mic"},
+            {"name": "Campeonato de LoL", "date": "15 de Março, 14:00", "description": "Mostre suas habilidades no Rift! Inscrições abertas com prêmios para os vencedores.", "icon": "swords"},
+            {"name": "Maratona Ghibli", "date": "22 de Março, 18:00", "description": "Uma noite mágica assistindo aos clássicos do Studio Ghibli em nosso canal de cinema.", "icon": "film"}
         ];
 
         const eventsGrid = document.getElementById('events-grid');
@@ -149,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 "question": "Quero fazer parte da Staff, como me inscrevo?",
-                "answer": "Adoramos seu interesse! Escolha a área que mais combina com você e preencha o formulário: <br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Moderação</a></b><br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Movimentação</a></b><br>• <b><a href='#' class='text-pink-400 hover:underline'>Equipe de Parcerias</a></b>"
+                "answer": "Adoramos seu interesse! Escolha a área que mais combina com você e preencha o formulário: <br>• <b><a href='#' target='_blank' class='text-pink-400 hover:underline'>Equipe de Moderação</a></b><br>• <b><a href='#' target='_blank' class='text-pink-400 hover:underline'>Equipe de Movimentação</a></b><br>• <b><a href='#' target='_blank' class='text-pink-400 hover:underline'>Equipe de Parcerias</a></b>"
             },
             {
                 "question": "Fui banido, como posso pedir revisão?",
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             {
                 "question": "Sou Artista ou Influenciador, tenho algum destaque?",
-                "answer": "Com certeza! Temos apoio para verificados como <b>Streamer, Cantor, Produtor, Influenciador, Editor e Designer</b>. Para conseguir seu cargo, basta abrir um ticket. Confira os requisitos no canal: <a href='#' class='text-pink-400 hover:underline'><b>Cargos Especiais</b></a>."
+                "answer": "Com certeza! Temos apoio para verificados como <b>Streamer, Cantor, Produtor, Influenciador, Editor e Designer</b>. Para conseguir seu cargo, basta abrir um ticket."
             }
         ];
 
@@ -326,8 +327,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Typing Indicator
             this.showTypingIndicator();
 
-            // --- LÓGICA HÍBRIDA ---
-            // Tenta responder com as FAQs primeiro (Custo Zero)
+            // --- LÓGICA HÍBRIDA (Economia de API) ---
+            // Tenta responder com as FAQs locais primeiro
             const localResponse = this.checkLocalFAQ(text);
 
             if (localResponse) {
@@ -357,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return "Para entrar, clique no botão 'Entrar no Servidor' no topo da página ou use este link: discord.gg/animescafe ☕";
             
             if (lower.includes('guilda') || lower.includes('clã') || lower.includes('time')) 
-                return "As Guildas são o coração do Café! Você pode criar a sua falando com a Staff ou entrar em uma existente. Elas competem por pontos!";
+                return "As Guildas são o coração do Café! Você pode criar a sua falando com a Staff ou entrar em uma existente na seção 'Guildas'.";
             
             if (lower.includes('regras') || lower.includes('pode fazer')) 
                 return "Respeito acima de tudo! Sem spam, sem flood e conteúdo NSFW apenas nos canais permitidos. Leia tudo em #regras.";
@@ -374,6 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lower.includes('parceria')) 
                 return "Para parcerias, verifique os requisitos no canal #parcerias e abra um ticket!";
             
+            if (lower.includes('musica') || lower.includes('música')) 
+                return "Temos o Jockie Music e o Samzinho para animar o chat de voz!";
+
             if (lower.includes('oi') || lower.includes('olá') || lower.includes('bom dia') || lower.includes('boa noite')) 
                 return "Olá! 🌸 Tudo bem com você? Aceita um chá ou café?";
 
@@ -512,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const meResponse = await fetch('/api/me');
             if (!meResponse.ok) {
+                // Se não estiver logado, mostra aviso
                 myGuildSection.innerHTML = '<p class="text-center text-gray-400 mt-4">Faça login para criar ou ver sua guilda.</p>';
                 return;
             }
@@ -528,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error("Erro ao carregar status da guilda:", error);
-            myGuildSection.innerHTML = '<p class="text-red-500">Erro de conexão.</p>';
+            myGuildSection.innerHTML = '<p class="text-red-500">Erro de conexão com o sistema de guildas.</p>';
         }
     }
 
@@ -554,7 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         } catch (error) {
             console.error("Erro ao carregar ranking de guildas:", error);
-            guildRankingList.innerHTML = '<p class="text-gray-500">Ranking indisponível.</p>';
+            // Mensagem amigável de fallback
+            guildRankingList.innerHTML = '<p class="text-gray-500">Ranking indisponível no momento.</p>';
         }
     }
 
@@ -585,13 +591,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newMemberId = newMemberIdInput.value;
                 const guildId = e.target.dataset.guildId;
                 try {
-                    const response = await fetch(`/api/guilds/${guildId}/members`, {
+                    const response = await fetch(`/api/guilds/${guildId}/invite`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ newMemberId }),
+                        body: JSON.stringify({ receiverId: newMemberId }),
                     });
                     if (response.ok) {
-                        loadMyGuildStatus();
+                        alert("Convite enviado!");
+                        newMemberIdInput.value = "";
                     } else {
                         const data = await response.json();
                         alert(`Erro: ${data.error}`);
@@ -601,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Carrega dados iniciais das Guildas
     loadMyGuildStatus();
     loadGuildRanking();
 });
