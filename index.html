@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Animes Café ☕ | Seu Refúgio Otaku</title>
 
-    <!-- Bibliotecas Externas (Tailwind, Socket.IO, Lucide) -->
+    <!-- Bibliotecas Externas (Tailwind, Socket.IO, Lucide Icons) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <!-- Lucide Icons Latest (Essencial para os ícones do chat) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Fontes -->
+    <!-- Fontes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-    <!-- CSS Personalizado -->
+    <!-- CSS Personalizado (Está na raiz junto com o index.html) -->
     <link rel="stylesheet" href="style.css">
 
     <!-- Configuração do Tailwind -->
@@ -33,7 +32,7 @@
 </head>
 <body class="bg-gray-900 text-white font-poppins overflow-x-hidden">
 
-    <!-- Header -->
+    <!-- ================= HEADER ================= -->
     <header class="fixed top-0 left-0 w-full bg-black/30 backdrop-blur-lg border-b border-gray-800 z-50 transition-all duration-300">
         <div class="container mx-auto flex justify-between items-center p-4">
             <a href="#inicio" class="text-2xl font-bold tracking-wider hover:text-pink-400 transition-colors">Animes Café ☕</a>
@@ -44,6 +43,7 @@
                 <a href="#faq" class="hover:text-pink-400 transition-colors">FAQ</a>
                 <a href="#suporte" class="hover:text-pink-400 transition-colors">Suporte</a>
                 <div id="auth-section">
+                    <!-- O JS vai preencher aqui com o Login/Avatar -->
                     <a href="/auth/discord" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-md transition-all duration-300">Login com Discord</a>
                 </div>
             </nav>
@@ -63,7 +63,7 @@
     </header>
 
     <main>
-        <!-- Seção Hero (Background dinâmico) -->
+        <!-- ================= HERO (INÍCIO) ================= -->
         <section id="inicio" class="min-h-screen flex items-center justify-center bg-cover bg-center bg-fixed">
             <div class="absolute inset-0 bg-black/70"></div>
             <div class="container mx-auto text-center z-10 p-4 animate-fade-in-up">
@@ -77,7 +77,7 @@
             </div>
         </section>
 
-        <!-- Seção de Guildas (Com área de convites) -->
+        <!-- ================= GUILDAS (SISTEMA PRINCIPAL) ================= -->
         <section id="guildas" class="py-20 bg-gray-950">
             <div class="container mx-auto p-4">
                 <div class="text-center mb-12">
@@ -86,27 +86,28 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-                    <!-- Coluna da Esquerda: Convites + Minha Guilda -->
+                    
+                    <!-- COLUNA ESQUERDA: Minha Guilda + Convites -->
                     <div class="lg:col-span-1 space-y-6">
                         
-                        <!-- ÁREA DE CONVITES (Gerenciada pelo guild-invites.js) -->
+                        <!-- 1. Área de Convites (Gerenciada pelo guild-invites.js) -->
                         <div id="invites-section" class="hidden bg-gray-900/80 border border-yellow-500/30 p-4 rounded-lg shadow-lg shadow-yellow-900/20 animate-pulse">
                             <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-800">
                                 <i data-lucide="mail" class="text-yellow-400 w-4 h-4"></i>
                                 <h4 class="text-yellow-400 font-bold text-sm uppercase tracking-wide">Convites Pendentes</h4>
                             </div>
                             <div id="invites-list" class="space-y-3">
-                                <!-- O JS preenche aqui -->
+                                <!-- O JS vai injetar os convites aqui -->
                             </div>
                         </div>
 
-                        <!-- Área da Guilda Atual -->
+                        <!-- 2. Área da Guilda Atual (Gerenciada pelo script.js) -->
                         <div id="my-guild-section" class="bg-gray-900 p-6 rounded-lg border border-gray-800">
                             <p class="text-center text-gray-500">Carregando informações da sua guilda...</p>
                         </div>
                     </div>
 
-                    <!-- Coluna da Direita: Ranking -->
+                    <!-- COLUNA DIREITA: Ranking -->
                     <div class="lg:col-span-2">
                         <h3 class="text-2xl font-bold mb-6 text-center lg:text-left">Ranking de Pontos</h3>
                         <div id="guild-ranking-list" class="flex flex-col gap-4">
@@ -117,18 +118,18 @@
             </div>
         </section>
 
-        <!-- Seção de Eventos -->
+        <!-- ================= EVENTOS ================= -->
         <section id="eventos" class="py-20 bg-gray-900">
             <div class="container mx-auto p-4 text-center">
                 <h2 class="text-4xl font-bold mb-2">Nossos <span class="text-purple-400">Eventos</span></h2>
                 <p class="text-gray-400 mb-12">Fique por dentro de tudo que acontece no servidor!</p>
                 <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Preenchido via JS -->
+                    <!-- O JS vai preencher esta área -->
                 </div>
             </div>
         </section>
 
-        <!-- Seção de FAQ (Perguntas Frequentes) -->
+        <!-- ================= FAQ (PERGUNTAS FREQUENTES) ================= -->
         <section id="faq" class="py-20 bg-gray-950 relative">
             <div class="container mx-auto p-4 max-w-4xl">
                 <div class="text-center mb-12">
@@ -136,14 +137,13 @@
                     <p class="text-gray-400">Tire suas dúvidas sobre o Animes Café num piscar de olhos.</p>
                 </div>
 
-                <!-- Onde as perguntas vão aparecer -->
                 <div id="faq-list" class="space-y-4">
                     <p class="text-center text-gray-500 animate-pulse">Carregando perguntas...</p>
                 </div>
             </div>
         </section>
 
-        <!-- Seção de Suporte -->
+        <!-- ================= SUPORTE (CALL TO ACTION) ================= -->
         <section id="suporte" class="py-20">
             <div class="container mx-auto p-4 text-center">
                 <h2 class="text-4xl font-bold mb-4">Precisa de <span class="text-blue-400">Ajuda?</span></h2>
@@ -155,7 +155,7 @@
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- FOOTER -->
     <footer class="bg-gray-950/50 border-t border-gray-800 py-8">
         <div class="container mx-auto text-center text-gray-400">
             <p class="mb-4">© 2025 Animes Café — desenvolvido por Vinicius Prati</p>
@@ -167,9 +167,9 @@
         </div>
     </footer>
 
-    <!-- WIDGET DE CHAT (CORRIGIDO E OTIMIZADO) -->
+    <!-- ================= WIDGET DE CHAT (COM SVG FIXO) ================= -->
     <div id="chat-widget" class="hidden fixed bottom-5 right-5 w-80 h-[500px] bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl flex flex-col z-50 transition-all duration-300 transform origin-bottom-right">
-        <!-- Header do Chat -->
+        <!-- Header -->
         <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-t-2xl shadow-md">
             <div class="flex items-center gap-2">
                 <div class="bg-white/20 p-1.5 rounded-full">
@@ -183,7 +183,7 @@
                 </div>
             </div>
             
-            <!-- BOTÃO DE FECHAR (SVG FIXO: Resolve o bug do X sumindo) -->
+            <!-- BOTÃO DE FECHAR (SVG FIXO E CENTRALIZADO) -->
             <button id="close-chat-btn" type="button" class="flex items-center justify-center text-white/90 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-all cursor-pointer z-50">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -195,10 +195,10 @@
         <!-- Mensagens -->
         <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-900 scrollbar-thin"></div>
 
-        <!-- Input Area -->
+        <!-- Input -->
         <div class="p-3 bg-gray-800 border-t border-gray-700 rounded-b-2xl">
             <form id="chat-form" class="flex items-center space-x-2 relative">
-                <input type="text" id="chat-input" placeholder="Digite sua dúvida..." autocomplete="off" class="flex-1 bg-gray-900 text-white text-sm rounded-full pl-4 pr-10 py-3 border border-gray-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-500">
+                <input type="text" id="chat-input" placeholder="Digite sua dúvida..." autocomplete="off" class="flex-1 bg-gray-900 text-white text-sm rounded-full pl-4 pr-10 py-3 border border-gray-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
                 <button type="submit" class="absolute right-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full p-1.5 transition-all shadow-lg hover:shadow-blue-500/50">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
@@ -209,9 +209,9 @@
         </div>
     </div>
 
-    <!-- Script Principal (Lógica Geral + Chat) -->
+    <!-- ================= SCRIPTS ================= -->
+    <!-- Como estão na mesma pasta (SITE-ANC), usamos apenas o nome do arquivo -->
     <script src="script.js"></script>
-    <!-- Script de Convites (Lógica da Guilda) -->
     <script src="guild-invites.js"></script>
 </body>
 </html>

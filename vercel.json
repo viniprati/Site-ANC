@@ -1,35 +1,17 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/backend/server.js"
     },
     {
-      "src": "*.html",
-      "use": "@vercel/static"
+      "source": "/auth/(.*)",
+      "destination": "/backend/server.js"
     },
     {
-      "src": "*.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/events.json",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(api|auth)/.*",
-      "dest": "backend/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
