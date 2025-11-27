@@ -1,52 +1,72 @@
+// Tenta carregar o .env localmente. Se não achar (na Vercel), segue a vida.
 require('dotenv').config({ path: '../.env' }); 
+
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const passport = require('passport'); // ADICIONADO: Necessário para gerenciar o usuário logado
+const passport = require('passport');
 
 // Importação das rotas
 const authRoutes = require('./routes/authRoutes');
-const guildRoutes = require('./routes/guildRoutes'); // ADICIONADO: Rotas do sistema de guildas
+const guildRoutes = require('./routes/guildRoutes');
 
 const app = express();
-const port = process.env.PORT || 4000; // Adaptado para pegar a porta do ambiente se disponível
+const port = process.env.PORT || 4000;
 
-// ADICIONADO: Essencial para ler os dados enviados pelos formulários (JSON)
-app.use(express.json());
+// ===================================================
+// 1. MIDDLEWARES ESSENCIAIS
+// ===================================================
+// Permite ler JSON e dados de formulário
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// CÓDIGO CORRIGIDO AQUI (Sessão)
+// ===================================================
+// 2. CONFIGURAÇÃO DE SESSÃO
+// ===================================================
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'segredo_local', // Fallback para não quebrar
+    // Usa a secret do .env (Local) ou do Painel Vercel. Se falhar tudo, usa o segredo padrão.
+    secret: process.env.SESSION_SECRET || 'segredo_de_desenvolvimento', 
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } 
+    cookie: { secure: false } // Mude para 'true' se estiver usando HTTPS na Vercel, mas 'false' geralmente evita bugs de cookie
 }));
 
-// ADICIONADO: Inicializa o Passport (Sem isso o login não persiste e a guilda não sabe quem é o dono)
+// ===================================================
+// 3. INICIALIZAÇÃO DO PASSPORT
+// ===================================================
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Servindo os arquivos do front-end
+// ===================================================
+// 4. ARQUIVOS ESTÁTICOS
+// ===================================================
+// Serve a pasta raiz (onde está o index.html)
 app.use(express.static(path.join(__dirname, '..')));
 
-// Usando as rotas
-app.use('/auth', authRoutes); // Mudei para '/auth' para bater com o link do HTML (/auth/discord)
-app.use('/api/guilds', guildRoutes); // Adicionado para as guildas funcionarem
+// ===================================================
+// 5. ROTAS DA API
+// ===================================================
+app.use('/auth', authRoutes); 
+app.use('/api/guilds', guildRoutes);
 
-// Adicionado: Rota simples para o script.js saber quem está logado
+// Rota de verificação de login
 app.get('/api/me', (req, res) => {
-    if (req.isAuthenticated()) res.json(req.user);
-    else res.status(401).json({ error: 'Não logado' });
+    if (req.isAuthenticated()) {
+        res.json(req.user);
+    } else {
+        res.status(401).json({ error: 'Não logado' });
+    }
 });
 
-// ADAPTAÇÃO PARA VERCEL:
-// O 'app.listen' trava a Vercel se não estiver condicional.
+// ===================================================
+// 6. INICIALIZAÇÃO (ADAPTADA PARA VERCEL)
+// ===================================================
+// Apenas inicia a porta se estiver rodando no seu PC
 if (require.main === module) {
     app.listen(port, () => {
         console.log(`🚀 Servidor rodando lindamente em http://localhost:${port}`);
     });
 }
 
-// Exporta para a Vercel conseguir executar
+// Exporta para a Vercel
 module.exports = app;
